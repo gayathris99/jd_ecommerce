@@ -1,14 +1,37 @@
 from django.db import models
 from django.conf import settings
+from django.shortcuts import reverse
 # Create your models here.
+
+CATEGORY_CHOICES = (
+    ('S', 'Shirt'),
+    ('SW', 'Sport Wear'),
+    ('OW', 'OutWear'),
+)
+
+LABEL_CHOICES = (
+    ('P', 'primary'),
+    ('S', 'secondary'),
+    ('D', 'danger'),
+)
 
 class Item(models.Model):
     title = models.CharField(max_length = 100)
     price = models.FloatField(default = None)
-    
+    discount_price = models.FloatField(blank = True , null = True)
+    category = models.CharField(max_length = 2 , choices = CATEGORY_CHOICES)
+    label = models.CharField(max_length = 1 , choices = LABEL_CHOICES)
+    slug = models.SlugField()
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("core:products", kwargs = {
+            "slug": self.slug
+        })
+
+    
 
 class OrderItem(models.Model):
     item = models.ForeignKey(Item , on_delete = models.CASCADE)
